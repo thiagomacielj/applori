@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCare - Controle de Despesas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="text-4xl">🐾</div>
+                    <div>
+                        <h1 class="text-3xl font-bold">LoriApp</h1>
+                        <p class="text-purple-100">Controle de Despesas do seu Pet</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-semibold">Total Gasto</p>
+                    <p class="text-2xl font-bold" id="totalAmount">R$ 0,00</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-1 bg-white rounded-xl p-1 shadow-lg mb-8">
+            <button onclick="showTab('expenses')" id="expensesTab"
+                class="flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-300 bg-purple-600 text-white">
+                💰 Despesas
+            </button>
+            <button onclick="showTab('vaccines')" id="vaccinesTab"
+                class="flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-300 text-gray-600 hover:bg-gray-100">
+                💉 Vacinas
+            </button>
+            <button onclick="showTab('reports')" id="reportsTab"
+                class="flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-300 text-gray-600 hover:bg-gray-100">
+                📊 Relatórios
+            </button>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div id="expensesContent" class="tab-content">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Add Expense Form -->
+                <div class="lg:col-span-1">
+                    <div class="pet-card rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="text-2xl mr-3">➕</span>
+                            Nova Despesa
+                        </h2>
+
+                        <form id="expenseForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
+                                <input type="text" id="expenseDescription" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="Ex: Ração Premium">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Valor (R$)</label>
+                                <input type="number" id="expenseAmount" required step="0.01" min="0"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="0,00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Categoria</label>
+                                <select id="expenseCategory" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">Selecione uma categoria</option>
+                                    <option value="alimentacao">🍖 Alimentação</option>
+                                    <option value="veterinario">🏥 Veterinário</option>
+                                    <option value="medicamentos">💊 Medicamentos</option>
+                                    <option value="brinquedos">🎾 Brinquedos</option>
+                                    <option value="higiene">🛁 Higiene</option>
+                                    <option value="acessorios">👔 Acessórios</option>
+                                    <option value="outros">📦 Outros</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Local da Compra</label>
+                                <input type="text" id="expenseLocation" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="Ex: Pet Shop Central">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Data</label>
+                                <input type="date" id="expenseDate" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105">
+                                Adicionar Despesa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Expenses List -->
+                <div class="lg:col-span-2">
+                    <div class="pet-card rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="text-2xl mr-3">📋</span>
+                            Histórico de Despesas
+                        </h2>
+
+                        <div id="expensesList" class="space-y-4">
+                            <div class="text-center py-12 text-gray-500">
+                                <div class="text-6xl mb-4">🐕</div>
+                                <p class="text-lg">Nenhuma despesa cadastrada ainda</p>
+                                <p class="text-sm">Adicione a primeira despesa do seu pet!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vaccines Tab -->
+        <div id="vaccinesContent" class="tab-content hidden">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Add Vaccine Form -->
+                <div class="lg:col-span-1">
+                    <div class="pet-card rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="text-2xl mr-3">💉</span>
+                            Nova Vacina
+                        </h2>
+
+                        <form id="vaccineForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nome da Vacina</label>
+                                <select id="vaccineName" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">Selecione a vacina</option>
+                                    <option value="v8">V8 (Óctupla)</option>
+                                    <option value="v10">V10 (Déctupla)</option>
+                                    <option value="raiva">Antirrábica</option>
+                                    <option value="gripe">Gripe Canina</option>
+                                    <option value="giardia">Giárdia</option>
+                                    <option value="leishmaniose">Leishmaniose</option>
+                                    <option value="outras">Outras</option>
+                                </select>
+                            </div>
+
+                            <div id="customVaccineDiv" class="hidden">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nome Personalizado</label>
+                                <input type="text" id="customVaccineName"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="Digite o nome da vacina">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Data da Aplicação</label>
+                                <input type="date" id="vaccineDate" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Próxima Dose</label>
+                                <input type="date" id="nextVaccineDate"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-sm font-semibold text-gray-700 mb-2">Veterinário/Clínica</label>
+                                <input type="text" id="vaccineVet" required
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="Ex: Dr. João - Clínica VetCare">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Valor (R$)</label>
+                                <input type="number" id="vaccineAmount" step="0.01" min="0"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="0,00">
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105">
+                                Registrar Vacina
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Vaccines List -->
+                <div class="lg:col-span-2">
+                    <div class="pet-card rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="text-2xl mr-3">📅</span>
+                            Cartão de Vacinas
+                        </h2>
+
+                        <div id="vaccinesList" class="space-y-4">
+                            <div class="text-center py-12 text-gray-500">
+                                <div class="text-6xl mb-4">💉</div>
+                                <p class="text-lg">Nenhuma vacina registrada</p>
+                                <p class="text-sm">Mantenha o cartão de vacinas sempre atualizado!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reportsContent" class="tab-content hidden">
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Summary Cards -->
+                <div class="space-y-6">
+                    <div class="pet-card rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-xl mr-3">💰</span>
+                            Resumo Financeiro
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-blue-50 rounded-xl">
+                                <span class="font-semibold text-blue-800">Total Gasto</span>
+                                <span class="text-xl font-bold text-blue-600" id="reportTotal">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-green-50 rounded-xl">
+                                <span class="font-semibold text-green-800">Média Mensal</span>
+                                <span class="text-xl font-bold text-green-600" id="reportAverage">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-purple-50 rounded-xl">
+                                <span class="font-semibold text-purple-800">Vacinas em Dia</span>
+                                <span class="text-xl font-bold text-purple-600" id="reportVaccines">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pet-card rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="text-xl mr-3">📊</span>
+                            Gastos por Categoria
+                        </h3>
+                        <div id="categoryReport" class="space-y-3">
+                            <p class="text-gray-500 text-center py-8">Adicione despesas para ver o relatório</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Vaccines -->
+                <div class="pet-card rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <span class="text-xl mr-3">⏰</span>
+                        Próximas Vacinas
+                    </h3>
+                    <div id="upcomingVaccines" class="space-y-3">
+                        <p class="text-gray-500 text-center py-8">Nenhuma vacina agendada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
